@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Caixa
+  - Arma
+  - Coletavel
+  - Door
+  - Inimigo
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - Ground
+  - Interacao
+  - Inimigo
+  - Coletavel
+  - ObstaculosInimigo
+  - Player
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: BackGround
+    uniqueID: 203580349
+    locked: 0
+  - name: Paredes
+    uniqueID: 2272155713
+    locked: 0
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Player
+    uniqueID: 3931625117
+    locked: 0
+  - name: Plataformas
+    uniqueID: 72003579
+    locked: 0
+  - name: HUD
+    uniqueID: 946608171
+    locked: 0
