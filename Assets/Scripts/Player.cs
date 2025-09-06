@@ -75,6 +75,17 @@ public class Player : MonoBehaviour
 
 	void Update()
     {
+		if(GC.currentState == GameState.DIALOGO)
+		{
+			rb.velocity = new Vector2(0, rb.velocity.y);
+			animator.SetInteger("idAnimation", 0);
+
+			if(Input.GetButtonDown("Fire1"))
+			{
+				objetoInteracao.SendMessage("Falar", SendMessageOptions.DontRequireReceiver);
+			}
+		}
+
 		if (GC.currentState != GameState.GAMEPLAY)
 		{
 			return;

@@ -64,7 +64,7 @@ public class HUD : MonoBehaviour
 		}
 		else if (painelFlechas.activeSelf == true)
 		{
-			if (Input.GetButtonDown("bntL"))
+			if (Input.GetButtonDown("btnL"))
 			{
 				if (GC.idFlechaEquipada == 0)
 				{
@@ -75,7 +75,7 @@ public class HUD : MonoBehaviour
 					GC.idFlechaEquipada -= 1;
 				}
 			}
-			else if (Input.GetButtonDown("bntR"))
+			else if (Input.GetButtonDown("btnR"))
 			{
 				if (GC.idFlechaEquipada == GC.icoFlecha.Length - 1)
 				{

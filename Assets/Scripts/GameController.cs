@@ -8,11 +8,16 @@ public enum GameState
 {
 	GAMEPLAY,
 	PAUSE,
-	ITENS
+	ITENS,
+	DIALOGO,
+	FIMDIALOGO
 }
 
 public class GameController : MonoBehaviour
 {
+	public int idioma;
+	public string[] idiomaFolder;
+
 	public GameState currentState;
 	//private Fade fade;
 	private Player Player;
@@ -70,6 +75,8 @@ public class GameController : MonoBehaviour
 
 	//[Header("fistPainel")]
 	public Button fistPainelPause, fistPainelItens, fistPainelItemInfo;
+
+	public bool missao1;
 
 	void Start()
     {
@@ -158,6 +165,10 @@ public class GameController : MonoBehaviour
 
 			case GameState.PAUSE:
 				Time.timeScale = 0;
+				break;
+
+			case GameState.FIMDIALOGO:
+				StartCoroutine("FimConversa");
 				break;
 		}
 	}
@@ -261,5 +272,23 @@ public class GameController : MonoBehaviour
 			}
 		}
 
+	}
+
+	IEnumerator FimConversa()
+	{
+		yield return new WaitForEndOfFrame();
+		ChangeState(GameState.GAMEPLAY);
+	}
+
+	public string TextoFormatado(string frase)
+	{
+		string temp = frase;
+
+		temp = temp.Replace("|cor=yellow|", "<color=#FFFF00FF>");
+		temp = temp.Replace("|cor=red|", "<color=#FF0000FF>");
+
+		temp = temp.Replace("|/fimcor|", "</color>");
+
+		return temp;
 	}
 }

@@ -6866,6 +6866,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ebfa8b620b49a44eb32f0a244d90660, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  idioma: 0
+  idiomaFolder:
+  - en
+  - pt-br
   currentState: 0
   tiposDano:
   - Normal
