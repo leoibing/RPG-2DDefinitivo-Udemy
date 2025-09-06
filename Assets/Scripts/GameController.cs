@@ -2,7 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using TMPro;
+
+using System;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 public enum GameState
 {
@@ -10,11 +15,14 @@ public enum GameState
 	PAUSE,
 	ITENS,
 	DIALOGO,
-	FIMDIALOGO
+	FIMDIALOGO,
+	LOADGAME
 }
 
 public class GameController : MonoBehaviour
 {
+	private AudioController audioController;
+
 	public int idioma;
 	public string[] idiomaFolder;
 
@@ -22,6 +30,7 @@ public class GameController : MonoBehaviour
 	//private Fade fade;
 	private Player Player;
 	private Inventario inventario;
+	private HUD hud;
 
 	public string[] tiposDano;
 	public GameObject[] fxDano;
@@ -48,25 +57,31 @@ public class GameController : MonoBehaviour
 		idArmaInicial,
 		idFlechaEquipada;
 	public GameObject[] ArmaInicial;
+	public ItemModelo[] armaInicialPersonagem;
 
 	//[Header("Armas")]
-	public string[] NomeArma;
+	public List<string> NomeArma;
+	public List<Sprite> imgInventario;
 
-	public Sprite[]
-		imgInventario,
-		spriteArmas1, spriteArmas2, spriteArmas3, spriteArmas4,
-		icoFlecha,
-		imgFlecha;
-	public GameObject[] flechaPrefab;
-	public float[] velocidadeFlecha;
-	public int[]
-		qtdFlechas, // 0: Normal 1: Prata 2: Ouro
-		qtdPocoes, // 0: Cura 1: Mana
+	public List<int>
 		custoArma,
 		idClasseArma, // 0: de perto 1: arco 2: staff
 		danoMinArma, danoMaxArma,
-		tipoDanoArma,
-		aprimoramentoArma;
+	tipoDanoArma;
+
+	public List<Sprite> spriteArmas1, spriteArmas2, spriteArmas3, spriteArmas4;
+
+	public GameObject[] flechaPrefab;
+	public float[] velocidadeFlecha;
+
+	public int[]
+		qtdFlechas, // 0: Normal 1: Prata 2: Ouro
+		qtdPocoes; // 0: Cura 1: Mana
+	public List<int> aprimoramentoArma;
+
+	public Sprite[]
+	icoFlecha,
+	imgFlecha;
 
 	public Material Luz2D, padrao2D;
 
@@ -78,46 +93,47 @@ public class GameController : MonoBehaviour
 
 	public bool missao1;
 
+	public List<String> itensInventario;
+
 	void Start()
     {
 		//fade = FindObjectOfType(typeof(Fade)) as Fade;
 		//fade.FadeOut();
 		DontDestroyOnLoad(gameObject);
+
+		audioController = FindObjectOfType(typeof(AudioController)) as AudioController;
+
 		Player = FindObjectOfType(typeof(Player)) as Player;
 
+		hud = FindObjectOfType(typeof(HUD)) as HUD;
 		inventario = FindObjectOfType(typeof(Inventario)) as Inventario;
 
 		painelPause.SetActive(false);
 		painelItens.SetActive(false);
 		painelItemInfo.SetActive(false);
 
-		idPersonagem = PlayerPrefs.GetInt("idPersonagem");
-
-		inventario.itemInventario.Add(ArmaInicial[idPersonagem]);
-
-		GameObject tempArma = Instantiate(ArmaInicial[idPersonagem]);
-		inventario.itensCarregados.Add(tempArma);
-
-		idArmaInicial = tempArma.GetComponent<Item>().idItem;
-
-		vidaAtual = vidaMax;
-		manaAtual = manaMax;
-    }
+		Load(PlayerPrefs.GetString("slot"));
+	}
 
     void Update()
     {
-		if(Player == null) { Player = FindObjectOfType(typeof(Player)) as Player; }
-
-		string s = gold.ToString("N0");
-
-		goldTxt.text = s; //.Replace(",", ".")
-
-		//ValidarArma();
-
-		if(Input.GetButtonDown("Cancel") && currentState != GameState.ITENS)
+		if(currentState == GameState.GAMEPLAY)
 		{
-			PauseGame();
+			if (Player == null) { Player = FindObjectOfType(typeof(Player)) as Player; }
+
+			string s = gold.ToString("N0");
+
+			goldTxt.text = s; //.Replace(",", ".")
+
+			//ValidarArma();
+
+			if (Input.GetButtonDown("Cancel") && currentState != GameState.ITENS)
+			{
+				audioController.TocarFx(audioController.fxClick, 1);
+				PauseGame();
+			}
 		}
+
 	}
 
 	public void ValidarArma()
@@ -139,11 +155,13 @@ public class GameController : MonoBehaviour
 		switch(pauseState)
 		{
 			case true:
+				audioController.TrocarMusica(audioController.musicaTitulo, "", false);
 				//Time.timeScale = 0;
 				ChangeState(GameState.PAUSE);
 				fistPainelPause.Select();
 				break;
 			case false:
+				audioController.TrocarMusica(audioController.musicaFase1, "", false);
 				//Time.timeScale = 1;
 				ChangeState(GameState.GAMEPLAY);
 				break;
@@ -291,4 +309,125 @@ public class GameController : MonoBehaviour
 
 		return temp;
 	}
+
+	public void Save()
+	{
+		string nomeArquivoSave = PlayerPrefs.GetString("slot");
+
+		BinaryFormatter bf = new();
+		FileStream file = File.Create(Application.persistentDataPath + "/" + nomeArquivoSave);
+		PlayerData data = new();
+		data.idioma = idioma;
+		//data.idPersonagem = idPersonagem;
+		data.gold = gold;
+		data.idArma = idArma;
+
+		data.idFlechaEquipada = idFlechaEquipada;
+		data.qtdFlechas = qtdFlechas;
+		data.qtdPocoes = qtdPocoes;
+		data.aprimoramentoArma = aprimoramentoArma;
+
+		//
+		itensInventario.Clear();
+		foreach(GameObject i in inventario.itemInventario)
+		{
+			itensInventario.Add(i.name);
+		}
+
+		data.itensInventario = itensInventario;
+
+		bf.Serialize(file, data);
+		file.Close();
+
+	}
+
+	public void Load(string slot)
+	{
+		if(File.Exists(Application.persistentDataPath + "/playerdata.dat"))
+		{
+			BinaryFormatter bf = new();
+			FileStream file = File.Open(Application.persistentDataPath + "/playerdata.dat", FileMode.Open);
+			
+			PlayerData data = (PlayerData)bf.Deserialize(file);
+			file.Close();
+
+			idioma = data.idioma;
+			gold = data.gold;
+			idPersonagem = data.idPersonagem;
+			idFlechaEquipada = data.idFlechaEquipada;
+			qtdFlechas = data.qtdFlechas;
+			//qtdPocoes = data.qtdPocoes;
+			itensInventario = data.itensInventario;
+			aprimoramentoArma = data.aprimoramentoArma;
+
+			idArma = data.idArma;
+			idArmaAtual = data.idArma;
+			//idArmaInicial = data.idArma;
+
+			inventario.itemInventario.Clear();
+
+			foreach(string i in itensInventario)
+			{
+				inventario.itemInventario.Add(Resources.Load<GameObject>("Armas/" + i));
+			}
+
+			inventario.itemInventario.Add(ArmaInicial[idPersonagem]);
+			GameObject tempArma = Instantiate(ArmaInicial[idPersonagem]);
+			inventario.itensCarregados.Add(tempArma);
+			idArmaInicial = tempArma.GetComponent<Item>().idItem;
+
+			vidaAtual = vidaMax;
+			manaAtual = manaMax;
+
+			file.Close();
+			ChangeState(GameState.GAMEPLAY);
+			hud.VerificarHudPersonagem();
+			//SceneManager.LoadScene("Cena1");
+			string nomeCena = "Cena1";
+
+			audioController.TrocarMusica(audioController.musicaFase1, nomeCena, true);
+
+		}
+		else
+		{
+			NewGame();
+		}
+	}
+
+	public void Click()
+	{
+		audioController.TocarFx(audioController.fxClick, 1);
+	}
+
+	void NewGame()
+	{
+		gold = 0;
+		idPersonagem = PlayerPrefs.GetInt("idPersonagem");
+		idArma = armaInicialPersonagem[idPersonagem].idArma;
+
+		idFlechaEquipada = 0;
+		qtdFlechas[0] = 23;
+		qtdFlechas[1] = 1;
+		qtdFlechas[2] = 1;
+
+		qtdPocoes[0] = 3;
+		qtdPocoes[1] = 3;
+		Save();
+		Load(PlayerPrefs.GetString("slot"));
+	}
+}
+
+[Serializable]
+class PlayerData
+{
+	public int idioma,
+		gold,
+		idPersonagem,
+		idArma,
+		idFlechaEquipada;
+	public int[] qtdFlechas,
+		qtdPocoes;
+	public List<String> itensInventario;
+	public List<int> aprimoramentoArma;
+
 }

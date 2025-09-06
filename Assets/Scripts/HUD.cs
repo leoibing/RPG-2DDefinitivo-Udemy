@@ -36,7 +36,7 @@ public class HUD : MonoBehaviour
 		painelFlechas.SetActive(false);
 		boxMp.SetActive(false);
 		boxHp.SetActive(false);
-
+		//VerificarHudPersonagem();
 		if (GC.idClasse[GC.idPersonagem] == 2)
 		{
 			painelMana.SetActive(true);
@@ -47,7 +47,7 @@ public class HUD : MonoBehaviour
 			icoFlecha.sprite = GC.icoFlecha[GC.idFlechaEquipada];
 			painelFlechas.SetActive(true);
 		}
-
+		//
 		posA = boxA.anchoredPosition;
 		posB = boxB.anchoredPosition;
 	}
@@ -283,5 +283,22 @@ public class HUD : MonoBehaviour
 
 		if (GC.qtdPocoes[1] > 0) { boxMp.SetActive(true); }
 		else { boxMp.SetActive(false); }
+	}
+
+	public void VerificarHudPersonagem()
+	{
+		painelMana.SetActive(false);
+		painelFlechas.SetActive(false);
+
+		if (GC.idClasse[GC.idPersonagem] == 2)
+		{
+			painelMana.SetActive(true);
+
+		}
+		else if (GC.idClasse[GC.idPersonagem] == 1)
+		{
+			icoFlecha.sprite = GC.icoFlecha[GC.idFlechaEquipada];
+			painelFlechas.SetActive(true);
+		}
 	}
 }

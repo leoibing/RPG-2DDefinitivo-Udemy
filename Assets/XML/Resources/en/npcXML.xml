@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<dialogos>
+
+	<dialogo name="fala0">
+		<falas>
+		
+			<fala>enOi, meu nome é |cor=yellow|Pedro|/fimcor|!</fala>
+			<fala>Eu tenho uma missão para você!</fala>
+			<fala>Você aceita?</fala>
+		</falas>
+	</dialogo>
+	
+	
+	<dialogo name="fala1">
+		<falas>
+		
+			<fala>enFico feliz em saber que você irá me ajudar!</fala>
+			<fala>Ao terminar a missão volte a falar comigo!</fala>
+			<fala>Até Logo!</fala>
+		</falas>
+	</dialogo>
+	
+	<dialogo name="fala2">
+		<falas>
+		
+			<fala>enQue pena!</fala>
+			<fala>Se mudar de ideia, volte a falar comigo!</fala>
+			<fala>Até Logo!</fala>
+		</falas>
+	</dialogo>
+	
+	<dialogo name="fala3">
+		<falas>
+		
+			<fala>enVolte a falar comigo quando terminar a missão</fala>
+			<fala>Até Logo!</fala>
+		</falas>
+	</dialogo>
+	
+	<dialogo name="fala4">
+		<falas>
+		
+			<fala>enVejo que terminou sua missão com sucesso</fala>
+			<fala>Receba sua recompensa!</fala>
+			<fala>Até Logo!</fala>
+		</falas>
+	</dialogo>
+	
+	<dialogo name="fala5">
+		<falas>
+			<fala>enAté Logo!</fala>
+		</falas>
+	</dialogo>
+	
+	<dialogo name="resposta0">
+		<falas>
+		
+			<fala>enSim, eu aceito a missão!</fala>
+			<fala>enNão, eu já tenho outras coisas para fazer!</fala>
+		</falas>
+	</dialogo>
+	
+	
+</dialogos>

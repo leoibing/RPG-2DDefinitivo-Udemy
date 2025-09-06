@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+	private AudioController audioController;
 	private GameController GC;
 
 	private Animator animator;
@@ -29,6 +30,7 @@ public class Player : MonoBehaviour
 
 	void Start()
     {
+		audioController = FindObjectOfType(typeof(AudioController)) as AudioController;
 		GC = FindObjectOfType(typeof(GameController)) as GameController;
 
 		vidaMax = GC.vidaMax;
@@ -228,6 +230,7 @@ public class Player : MonoBehaviour
 				StartCoroutine("EsperarNovoAtaque");
 				break;
 			case 1:
+				audioController.TocarFx(audioController.fxSword, 1);
 				attaking = true;
 				break;
 		}
@@ -247,6 +250,7 @@ public class Player : MonoBehaviour
 			case 2:
 				if(GC.qtdFlechas[GC.idFlechaEquipada] > 0)
 				{
+					audioController.TocarFx(audioController.fxBow, 1);
 					GC.qtdFlechas[GC.idFlechaEquipada] -= 1;
 					GameObject tempPrefab = Instantiate(GC.flechaPrefab[GC.idFlechaEquipada], spawnFlecha.position, spawnFlecha.localRotation);
 					tempPrefab.transform.localScale = new Vector3(tempPrefab.transform.localScale.x * dir.x, tempPrefab.transform.localScale.y, tempPrefab.transform.localScale.z);
@@ -272,6 +276,7 @@ public class Player : MonoBehaviour
 			case 2:
 				if(GC.manaAtual > 0)
 				{
+					audioController.TocarFx(audioController.fxStaff, 1);
 					GC.manaAtual -= 1;
 					GameObject tempPrefab = Instantiate(magiaPrefab, spawnMagia.position, spawnMagia.localRotation);
 					tempPrefab.GetComponent<Rigidbody2D>().velocity = new Vector2(3 * dir.x, 0);
@@ -282,25 +287,6 @@ public class Player : MonoBehaviour
 		}
 	}
 
-	void Interagir()
-	{
-		Debug.DrawRay(hand.position, dir * 0.2f, Color.red);
-		RaycastHit2D hit = Physics2D.Raycast(hand.position, dir, 0.2f, interacao);
-
-		if(hit == true)
-		{
-			objetoInteracao = hit.collider.gameObject;
-			balaoAlerta.SetActive(true);
-		}
-		else
-		{
-			objetoInteracao = null;
-			balaoAlerta.SetActive(false);
-		}
-		
-	}
-
-	//Eventos na Animação
 	void ControleArma(int id)
 	{
 		foreach (GameObject a in armas)
@@ -329,6 +315,24 @@ public class Player : MonoBehaviour
 		}
 
 		staffs[id].SetActive(true);
+	}
+
+	void Interagir()
+	{
+		Debug.DrawRay(hand.position, dir * 0.2f, Color.red);
+		RaycastHit2D hit = Physics2D.Raycast(hand.position, dir, 0.2f, interacao);
+
+		if (hit == true)
+		{
+			objetoInteracao = hit.collider.gameObject;
+			balaoAlerta.SetActive(true);
+		}
+		else
+		{
+			objetoInteracao = null;
+			balaoAlerta.SetActive(false);
+		}
+
 	}
 
 	private void OnTriggerEnter2D(Collider2D col)
